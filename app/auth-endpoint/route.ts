@@ -1,16 +1,17 @@
 import { adminDb } from "@/firebase-admin";
-import liveBlocks, { liveblocks } from "@/lib/liveBlocks";
+import liveblocks from "@/lib/liveBlocks";
 import { auth } from "@clerk/nextjs/server";
-import { exists } from "fs";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const { sessionClaims } = await req.json();
+  // auth().pro
+
+  const { sessionClaims } = await auth();
   const { room } = await req.json();
+
+  console.log("sessionClaims===>", sessionClaims?.email);
+  console.log("room===>", room);
 
   const session = liveblocks.prepareSession(sessionClaims?.email!, {
     userInfo: {
@@ -21,14 +22,12 @@ export async function POST(req: NextRequest) {
   });
 
   const usersInRoom = await adminDb
-    .collection("rooms")
+    .collectionGroup("rooms")
     .where("userId", "==", sessionClaims?.email!)
     .get();
 
+  console.log("userInRoom", usersInRoom.docs);
   const userInRoom = usersInRoom.docs.find((doc) => doc.id === room);
-
-  const token = await session.authenticate();
-  return NextResponse.json({ token });
 
   if (userInRoom?.exists) {
     session.allow(room, session.FULL_ACCESS);

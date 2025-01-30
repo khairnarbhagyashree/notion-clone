@@ -1,10 +1,13 @@
-import { Liveblocks } from "@liveblocks/client";
-const key = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY;
+import { Liveblocks } from "@liveblocks/node";
+
+const key = process.env.LIVEBLOCKS_SECRET_KEY!;
+
 if (!key) {
-  throw new Error("NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY is not set");
+  throw new Error("LIVEBLOCKS_SECRET_KEY is not set");
 }
-export const liveblocks = new Liveblocks({
-  secretKey: key,
+
+const liveblocks = new Liveblocks({
+  secret: key,
 });
 
 export default liveblocks;
