@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
   const { sessionClaims } = await auth();
   const { room } = await req.json();
 
-  console.log("sessionClaims===>", sessionClaims?.email);
-  console.log("room===>", room);
+  // console.log("sessionClaims===>", sessionClaims?.email);
+  // console.log("room===>", room);
 
   const session = liveblocks.prepareSession(sessionClaims?.email!, {
     userInfo: {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     .where("userId", "==", sessionClaims?.email!)
     .get();
 
-  console.log("userInRoom", usersInRoom.docs);
+  // console.log("userInRoom", usersInRoom.docs);
   const userInRoom = usersInRoom.docs.find((doc) => doc.id === room);
 
   if (userInRoom?.exists) {
@@ -35,6 +35,6 @@ export async function POST(req: NextRequest) {
 
     return new Response(body, { status });
   } else {
-    return NextResponse.json({ error: "User not in room" }, { status: 400 });
+    return NextResponse.json({ error: "User not in room" }, { status: 403 });
   }
 }
