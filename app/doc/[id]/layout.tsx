@@ -4,15 +4,16 @@ import { redirect } from "next/navigation";
 
 async function DocLayout({
   children,
-  params: { id },
+  params,
 }: {
   children: React.ReactNode;
   params: { id: string };
 }) {
   const { userId } = await auth();
+  const { id: paramsId } = await params;
   if (!userId) {
     redirect("/sign-in");
   }
-  return <RoomProvider roomId={id}>{children}</RoomProvider>;
+  return <RoomProvider roomId={paramsId}>{children}</RoomProvider>;
 }
 export default DocLayout;
