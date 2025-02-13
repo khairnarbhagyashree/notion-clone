@@ -3,7 +3,6 @@
 import { adminDb } from "@/firebase-admin";
 import liveblocks from "@/lib/liveBlocks";
 import { auth } from "@clerk/nextjs/server";
-import { useId } from "react";
 
 export async function createNewDocument() {
   const session = await auth();
@@ -33,7 +32,11 @@ export async function createNewDocument() {
 }
 
 export async function deleteDocument(roomId: string) {
-  auth().protect();
+  const session = await auth();
+  if (!session || !session.sessionClaims?.email) {
+    throw new Error("Unauthorized");
+  }
+
   console.log("deleteDocument", roomId);
   try {
     // delete document from documents collection itself
@@ -61,16 +64,25 @@ export async function deleteDocument(roomId: string) {
 }
 
 export async function inviteUserToDocument(roomId: string, email: string) {
-  auth().protect();
+  const session = await auth();
+  if (!session || !session.sessionClaims?.email) {
+    throw new Error("Unauthorized");
+  }
+
   console.log("inviteUserToDocument", roomId, email);
 
   try {
-    await adminDb.collection("users").doc(email).collection("rooms").set({
-      userId: email,
-      role: "editor",
-      createdAt: new Date(),
-      roomId,
-    });
+    await adminDb
+      .collection("users")
+      .doc(email)
+      .collection("rooms")
+      .doc(roomId)
+      .set({
+        userId: email,
+        role: "editor",
+        createdAt: new Date(),
+        roomId,
+      });
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -79,7 +91,11 @@ export async function inviteUserToDocument(roomId: string, email: string) {
 }
 
 export async function removeUserfromDocument(roomId: string, email: string) {
-  auth().protect();
+  const session = await auth();
+  if (!session || !session.sessionClaims?.email) {
+    throw new Error("Unauthorized");
+  }
+
   console.log("removeUserfromDocument", roomId, email);
 
   try {

@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,9 +20,8 @@ function InviteUser() {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const pathname = usePathname();
-  const router = useRouter();
 
-  const handleInvite = async (e: FocusEvent) => {
+  const handleInvite = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const roomId = pathname.split("/").pop();
